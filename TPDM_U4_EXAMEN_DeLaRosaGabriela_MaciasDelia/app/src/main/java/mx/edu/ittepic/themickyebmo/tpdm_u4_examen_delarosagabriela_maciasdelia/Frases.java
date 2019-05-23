@@ -9,13 +9,13 @@ public class Frases {
 
     Bitmap imagen;
     int x,y;
-    boolean visible;
+    boolean correcto;
 
-    public Frases(Lienzo lienzo, int imagen, int x, int y) {
+    public Frases(Lienzo lienzo, int imagen, int x, int y,boolean correcto) {
         this.imagen=BitmapFactory.decodeResource(lienzo.getResources(),imagen);
         this.x = x;
         this.y = y;
-        visible = false;
+        this.correcto = correcto;
     }
 
 

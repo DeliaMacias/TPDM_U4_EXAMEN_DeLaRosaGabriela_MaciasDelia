@@ -18,12 +18,29 @@ public class Lienzo extends View {
     int width,height,segundos,count_color,count_figura;
     boolean activo,gano,perdio;
     int yMax,xMax;
-
+    int[] correctos;
+    int puntos;
+    int ronda;
     CountDownTimer decometro;
-    Random posicion;
+    Random valores,colores;
 
-    Frases[] ArrayColor,ArrayFigura;
-    String[] F_Color,F_Figura;
+
+    int[] ArrayColor;
+    int[] Colores;
+    String[] F_Color;
+    int [][] posiciones;
+
+
+
+    Frases[][] array= new Frases[5][6];
+
+
+
+
+    int imagenes,figuras;
+    int rango;
+    int col;
+
 
 
     public Lienzo(Context context) {
@@ -31,36 +48,61 @@ public class Lienzo extends View {
 
         activo=true;
         gano=perdio=false;
-
+        width = getResources().getSystem().getDisplayMetrics().widthPixels;
+        height = getResources().getSystem().getDisplayMetrics().heightPixels-200;
+        correctos = new int[5];
+        puntos = 0;
+        ronda = 0;
         //VECTOR  DE LAS IMAGENES A SELECCIONAR
-        ArrayColor = new Frases[5];count_color=0;
-        ArrayFigura = new Frases[5];count_figura=0;
+        ArrayColor = new int[]{R.drawable.mora, R.drawable.azul,R.drawable.ama,R.drawable.rojo,R.drawable.rosa,R.drawable.verde};count_color=0;
+        F_Color = new String[]{"MORADO","AZUL","AMARILLO","ROJO","ROSA","VERDE"};
+        Colores = new int[]{
+                Color.rgb(143,0,143), //morado
+                Color.rgb(0,204,255), //azul
+                Color.rgb(255,255,0), //amarillo
+                Color.rgb(255,0,0), //rojo
+                Color.rgb(255,51,153), //rosa
+                Color.rgb(22,224,45)}; //verde
+
+        posiciones = new int[][]{
+                {width/4-100,height*3/8},
+                {width*3/4-100,height*3/8},
+                {width/4-100,height*5/8},
+                {width*3/4-100,height*5/8},
+                {width/4-100,height*7/8},
+                {width*3/4-100,height*7/8}
+        };
+        valores = new Random();
+        colores = new Random();
+         rango = 0+valores.nextInt(5);
+
+
 
         //PALABRAS
-        F_Color = new String[5];
-        F_Figura = new String[5];
 
 
-        posicion = new Random();
+
+
+
 
         segundos=15;
 
-        width = getResources().getSystem().getDisplayMetrics().widthPixels;
-        height = getResources().getSystem().getDisplayMetrics().heightPixels-200;
 
 
 
-        for (int i =0; i< ArrayColor.length; i++){
-            ArrayColor[i] = new Frases(this,R.drawable.ama,(1+posicion.nextInt(width-730)),(290+posicion
-                    .nextInt(height-250)));
-            ArrayColor[i] = new Frases(this,R.drawable.azul,(1+posicion.nextInt(width-730)),(290+posicion
-                    .nextInt(height-250)));
+
+        for (int i =0; i< 5; i++){
+            for (int y =0; y< 6; y++){
+                if(y == rango) {
+                    array[i][y] = new Frases(this, ArrayColor[y], posiciones[y][0], posiciones[y][1], true);
+                    correctos[i] = y;
+                } else {
+                    array[i][y] = new Frases(this, ArrayColor[y], posiciones[y][0], posiciones[y][1], false);
+                }
+            }
+            rango = 0+valores.nextInt(5);
         }
-        for (int y =0; y< ArrayFigura.length; y++){
-            ArrayFigura[y] = new Frases(this,R.drawable.tama,(1+posicion.nextInt(width-730)),(1+posicion
-                    .nextInt(height-900)));
 
-        }
 
         decometro = new CountDownTimer(1000,1000) {
             @Override
@@ -99,32 +141,20 @@ public class Lienzo extends View {
        /* Bitmap life2 =life.copy(Bitmap.Config.ARGB_8888,true);
         life2.setWidth(width-200);
         //life.setHeight(height);*/
+        canvas.drawColor(Color.WHITE);
         canvas.drawBitmap(life,1,1,p);
 
-        if (perdio && !gano) {
-            p.setColor(Color.BLACK);
-            p.setTextSize(100);
-            canvas.drawText("LO SIENTO, PERDISTE!!",width/2-525,height/2,p);
-        }else{
-            if(gano){
-                p.setColor(Color.BLACK);
-                p.setTextSize(100);
-                canvas.drawText("Felicidades, GANASTE!!",width/2-525,height/2,p);
-            }else {
-                if (activo) {
 
-                    canvas.drawBitmap(ArrayColor[count_color].imagen, ArrayColor[count_color].x, ArrayColor[count_color].y, p);
-                    ArrayColor[count_color].pintar(canvas, p);
+        //Genera la palabra
+        p.setColor(Colores[col]);
+        p.setTextSize(120);
+        canvas.drawText(F_Color[correctos[ronda]],width/2,100,p);
 
-                } else {
-                    canvas.drawBitmap(ArrayFigura[count_figura].imagen, ArrayFigura[count_figura].x, ArrayFigura[count_figura].y, p);
-                    ArrayFigura[count_figura].pintar(canvas, p);
-                    if (count_figura == ArrayFigura.length - 1) {
-                        gano = true;
-                    }
-                }
-            }
+        for (int i = 0;i <6;i++){
+            canvas.drawBitmap(array[ronda][i].imagen, array[ronda][i].x, array[ronda][i].y, p);
         }
+
+
 
 
 
@@ -134,9 +164,14 @@ public class Lienzo extends View {
         /*DECOMETRO*/
         p.setColor(Color.BLACK);
         p.setTextSize(100);
-        canvas.drawText(segundos+"",width/2,100,p);
+        canvas.drawText(segundos+"",10,height/8,p);
+        canvas.drawText(puntos+"",width/2,height/8,p);
         decometro.start();
 
+    }
+
+    public void cambiaColor(){
+        col = 0+colores.nextInt(5);
     }
 
     public boolean onTouchEvent(MotionEvent me){
@@ -146,22 +181,12 @@ public class Lienzo extends View {
 
         switch(accion){
             case MotionEvent.ACTION_DOWN: //presiono
-                if (!gano) {
-                    if (activo && ArrayColor[count_color].estaEnArea(posx, posy)) {
-                        if (count_color < ArrayColor.length) {
-                            if (count_color == ArrayColor.length - 1) {
-                                activo = false;
-                                segundos = 10;
-                            }
-                            count_color++;
-                        }
-                    }
-                    /*if (!activo && ArrayColor[jefe_muerte].estaEnArea(posx, posy)) {
-                        if (jefe_muerte < arrayMoscaJefe.length) {
-                            jefe_muerte++;
-                        }
-                    }*/
+                if (array[0][correctos[0]].estaEnArea(posx, posy)) {
+                    puntos++;
                 }
+                ronda++;
+                cambiaColor();
+                invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
