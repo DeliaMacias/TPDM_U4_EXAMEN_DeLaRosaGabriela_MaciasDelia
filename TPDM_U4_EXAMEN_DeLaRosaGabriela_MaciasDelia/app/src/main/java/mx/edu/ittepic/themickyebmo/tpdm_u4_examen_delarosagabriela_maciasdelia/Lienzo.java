@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -15,44 +16,36 @@ import java.util.Random;
 public class Lienzo extends View {
     BitmapFactory life;
     Paint p;
-    int width,height,segundos,count_color,count_figura;
-    boolean activo,gano,perdio;
+    int width,height,segundos,count_color;
+    boolean gano,perdio;
     int yMax,xMax;
     int[] correctos;
     int puntos;
     int ronda;
+    int vidas;
     CountDownTimer decometro;
     Random valores,colores;
-
-
     int[] ArrayColor;
     int[] Colores;
     String[] F_Color;
     int [][] posiciones;
-
-
-
     Frases[][] array= new Frases[5][6];
-
-
-
-
-    int imagenes,figuras;
     int rango;
     int col;
+    int[] corazones;
 
 
 
     public Lienzo(Context context) {
         super(context);
-
-        activo=true;
         gano=perdio=false;
         width = getResources().getSystem().getDisplayMetrics().widthPixels;
         height = getResources().getSystem().getDisplayMetrics().heightPixels-200;
         correctos = new int[5];
         puntos = 0;
         ronda = 0;
+        corazones = new int[]{R.drawable.kora3, R.drawable.kora2, R.drawable.kora1};
+        vidas=0;
         //VECTOR  DE LAS IMAGENES A SELECCIONAR
         ArrayColor = new int[]{R.drawable.mora, R.drawable.azul,R.drawable.ama,R.drawable.rojo,R.drawable.rosa,R.drawable.verde};count_color=0;
         F_Color = new String[]{"MORADO","AZUL","AMARILLO","ROJO","ROSA","VERDE"};
@@ -74,22 +67,8 @@ public class Lienzo extends View {
         };
         valores = new Random();
         colores = new Random();
-         rango = 0+valores.nextInt(5);
-
-
-
-        //PALABRAS
-
-
-
-
-
-
-        segundos=15;
-
-
-
-
+        rango = 0+valores.nextInt(5);
+        segundos=10;
 
         for (int i =0; i< 5; i++){
             for (int y =0; y< 6; y++){
@@ -102,8 +81,6 @@ public class Lienzo extends View {
             }
             rango = 0+valores.nextInt(5);
         }
-
-
         decometro = new CountDownTimer(1000,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -134,40 +111,35 @@ public class Lienzo extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Paint p = new Paint();
-        Bitmap life;
-        /*3 VIDAS*/
-        life = BitmapFactory.decodeResource(getResources(),R.drawable.kora3);
-
-       /* Bitmap life2 =life.copy(Bitmap.Config.ARGB_8888,true);
-        life2.setWidth(width-200);
-        //life.setHeight(height);*/
-        canvas.drawColor(Color.WHITE);
-        canvas.drawBitmap(life,1,1,p);
-
-
-        //Genera la palabra
-        p.setColor(Colores[col]);
-        p.setTextSize(120);
-        canvas.drawText(F_Color[correctos[ronda]],width/2,100,p);
-
-        for (int i = 0;i <6;i++){
-            canvas.drawBitmap(array[ronda][i].imagen, array[ronda][i].x, array[ronda][i].y, p);
+        if(gano) {
+            canvas.drawColor(Color.WHITE);
+            p.setTextSize(120);
+            canvas.drawText("GANASTE", width / 4, height / 2, p);
+        } else {
+            if (perdio) {
+                canvas.drawColor(Color.WHITE);
+                p.setTextSize(120);
+                canvas.drawText("PERDISTE", width / 4, height / 2, p);
+            } else {
+                canvas.drawColor(Color.WHITE);
+                if (vidas < 3) {
+                    canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), corazones[vidas]), 1, 1, p);
+                }
+                //Genera la palabra
+                p.setColor(Colores[col]);
+                p.setTextSize(120);
+                canvas.drawText(F_Color[correctos[ronda]], width / 2, 100, p);
+                for (int i = 0; i < 6; i++) {
+                    canvas.drawBitmap(array[ronda][i].imagen, array[ronda][i].x, array[ronda][i].y, p);
+                }
+                /*DECOMETRO*/
+                p.setColor(Color.BLACK);
+                p.setTextSize(100);
+                canvas.drawText(segundos + "", 10, height / 8, p);
+                canvas.drawText(puntos + "", width / 2, height / 8, p);
+                decometro.start();
+            }
         }
-
-
-
-
-
-
-
-
-        /*DECOMETRO*/
-        p.setColor(Color.BLACK);
-        p.setTextSize(100);
-        canvas.drawText(segundos+"",10,height/8,p);
-        canvas.drawText(puntos+"",width/2,height/8,p);
-        decometro.start();
-
     }
 
     public void cambiaColor(){
@@ -181,19 +153,28 @@ public class Lienzo extends View {
 
         switch(accion){
             case MotionEvent.ACTION_DOWN: //presiono
-                if (array[0][correctos[0]].estaEnArea(posx, posy)) {
+                if (array[ronda][correctos[ronda]].estaEnArea(posx, posy) && puntos<5) {
                     puntos++;
+                    if (puntos > 4) {
+                        gano = true;
+                    }
+                } else {
+                    vidas++;
                 }
-                ronda++;
-                cambiaColor();
-                invalidate();
+                if (ronda <4) {
+                    ronda++;
+                    cambiaColor();
+                    invalidate();
+                }
+                if(vidas>2 || segundos<1) {
+                    perdio = true;
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
                 break;
         }
-
         invalidate();
         return true;
     }
