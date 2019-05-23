@@ -36,7 +36,7 @@ public class Lienzo extends View {
 
 
 
-    public Lienzo(Context context) {
+    public Lienzo(Context context,int time) {
         super(context);
         gano=perdio=false;
         width = getResources().getSystem().getDisplayMetrics().widthPixels;
@@ -68,7 +68,7 @@ public class Lienzo extends View {
         valores = new Random();
         colores = new Random();
         rango = 0+valores.nextInt(5);
-        segundos=10;
+        segundos=time;
 
         for (int i =0; i< 5; i++){
             for (int y =0; y< 6; y++){

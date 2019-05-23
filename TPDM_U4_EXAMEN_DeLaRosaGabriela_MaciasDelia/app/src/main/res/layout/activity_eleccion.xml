@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+<Button
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:background="@drawable/equipo"
+    android:id="@+id/config"
+    android:layout_marginLeft="10dp"
+    android:layout_marginTop="10dp"
+    android:src="@mipmap/ic_launcher"
+    />
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -22,6 +31,35 @@
         android:layout_gravity="center"
         android:layout_below="@id/logo"
         />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="35dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fácil"
+            android:layout_marginRight="10dp"
+            />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/level"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Difícil"
+            android:layout_marginLeft="20dp"/>
+    </LinearLayout>
+
+
 
     <Button
         android:id="@+id/play"
@@ -29,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="60dp"
         android:background="@drawable/start"
         android:src="@mipmap/ic_launcher" />
 

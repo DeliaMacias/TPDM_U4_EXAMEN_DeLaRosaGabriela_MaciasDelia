@@ -8,6 +8,6 @@ public class inter extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(new Lienzo(this));
+        setContentView(new Lienzo(this,getIntent().getIntExtra("tiempo",10)));
     }
 }
